@@ -1,0 +1,14 @@
+[uwsgi]
+chdir = /code
+module = categories_api.wsgi:application
+vacuum = True
+max-requests = 5000
+harakiri = 1800
+env = DJANGO_SETTINGS_MODULE=categories_api.settings
+socket = 0.0.0.0:8001
+chmod-socket = 666
+master = true
+processes = 4
+buffer-size = 65535
+limit-post = 1048576000
+post-buffering = 10485760

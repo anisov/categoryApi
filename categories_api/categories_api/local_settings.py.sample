@@ -1,0 +1,22 @@
+import os
+
+DEBUG = True  # change in production
+ALLOWED_HOSTS = ['*']
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SECRET_KEY = os.getenv('SECRET_KEY') or '839d3##v)tzi^ryb5_yx(vm%yn-9^c_86+l22l=+5q0+*le%8c'
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'project',
+        'USER': 'project',
+        'PASSWORD': 'project',
+        'HOST': 'db',
+        'PORT': 5432,
+    }
+}
+
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
