@@ -13,7 +13,7 @@ class BaseCategoryApi:
 class CreateCategories(BaseCategoryApi, generics.CreateAPIView):
     serializer_class = CategorySerializer
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs) -> Response:
         super().post(request, *args, **kwargs)
         return Response(status=status.HTTP_201_CREATED)
 

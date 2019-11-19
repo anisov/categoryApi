@@ -4,34 +4,34 @@ from django.db.models import QuerySet
 
 class Category(models.Model):
     name = models.CharField(
-        verbose_name='Название',
-        max_length=200, unique=True
+        verbose_name='Название', max_length=200, unique=True
     )
     parent = models.ForeignKey(
-        'self', blank=True, null=True,
+        'self',
+        blank=True,
+        null=True,
         related_name='children',
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
     )
 
     @property
-    def siblings(self):
+    def siblings(self) -> list:
         if not self.parent_id:
             return []
         return self.convert_qs(
-            Category.objects.filter(parent=self.parent_id)
-                            .exclude(id=self.pk)
+            Category.objects.filter(parent=self.parent_id).exclude(id=self.pk)
         )
 
     @staticmethod
-    def convert_qs(qs: QuerySet):
+    def convert_qs(qs: QuerySet) -> list:
         assert not isinstance(qs, Category)
         return list(qs.values('id', 'name',))
 
     @property
-    def children_nodes(self):
+    def children_nodes(self) -> list:
         return self.convert_qs(self.children.all())
 
-    def __orm_get_parents(self):
+    def __orm_get_parents(self) -> list:
         # Request leak, but orm is used
         obj = self
         parents_list = list()
@@ -41,7 +41,7 @@ class Category(models.Model):
             parents_list.append(obj_dict)
         return parents_list
 
-    def __row_sql_parents(self):
+    def __row_sql_parents(self) -> list:
         # Fast, but use row sql
         query = """
                 WITH RECURSIVE CT AS 
@@ -54,15 +54,15 @@ class Category(models.Model):
                 SELECT id, name FROM CT WHERE id != %s
                 """
 
-        parents = self.__class__.objects.raw(
-            query, [self.pk, self.pk]
-        )
-        parents_list = [dict(name=parent.name, id=parent.pk) for parent in parents]
+        parents = self.__class__.objects.raw(query, [self.pk, self.pk])
+        parents_list = [
+            dict(name=parent.name, id=parent.pk) for parent in parents
+        ]
 
         return parents_list
 
     @property
-    def parents(self):
+    def parents(self) -> list:
         # Or can use self.__orm_get_parents()
         return self.__row_sql_parents()
 
